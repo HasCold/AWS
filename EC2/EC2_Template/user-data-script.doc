@@ -1,0 +1,21 @@
+------------------ User Date Script -----------------------
+
+. If u want to add nginx when launching the template of EC2 instance.
+. So we have to write the user-data script for that. 
+
+Go to the Launch Template Section --->> Actions --->> Modify Template 
+--->> Advanced Section --->> User data - optional 
+and write the your shell script for that.
+
+------------- Shell Script
+
+#!/bin/bash
+
+sudo apt-get update -y
+sudo apt-get install nginx -y
+
+// This is the command to create the file and write inside them.
+sudo echo "aws-learning-session Server IP address is ${hostname -i}" > /var/www/html/index.html
+
+// after that restart nginx
+sudo systemctl restart nginx

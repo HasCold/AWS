@@ -1,0 +1,5 @@
+--------------------- AWS Dynamo DB -------------------------
+
+- Lambda Function :- It is serverless service offered by AWS which will managed by the aws itself.
+
+- A code or lambda functions which will run on serverless. Pay as per your compute

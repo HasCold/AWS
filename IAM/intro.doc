@@ -1,0 +1,20 @@
+----------------- IAM (Identity Access Management) -------------------
+
+[Root] --->>> [Account] 
+         --->> Admin All Access
+         --->> IAM  
+
+- IAM 
+    --->> Identity Providers = If u want to give the access of your AWS account to any third party service like Github, GitLab, Jira etc or if there is another person which I want to give my AWS account access so can do it with this.
+
+
+    --->> Policies = Suppose one IAM user has what access, that is written in the policies and that user will be performed any action under these defined polices regarding any service to AWS assigned by Root/Admin.
+    Example :- EC2 instance resource only allow create policy access, S3 bucket resource only allow ListBucket, DeleteObject, ReadObject, CreateObject policies etc. 
+
+
+    --->> User Group = Best way to make polices, make user groups and assign policies inside them and whenever u need to assign policy to any IAM user so simply assign that particular user group.
+
+
+
+- FOR AWS CLI based access we have to get the token; 
+Access Key or Private Key are the keys to access the data or bucket.

@@ -1,0 +1,42 @@
+VPC (Virtual Private Cloud) = AWS service
+
+. Each device in the world has IP address e.g. smart phones, pc, LED watch, LED TV etc.
+
+. There are almost 4,294,967,296 IPv4 addresses in our world and v4 is the IP version.
+
+----------------------------------------------------------
+
+Make a separate VPC environment in the AWS Cloud which ensure the isolation, security and ip addresses allocation to their respective "vpc network".
+
+- If we break out the big cloud network into smaller networks like subnets e.g. :- public subnet, private subnet. 
+1. Public Subnet = which has the access of the public internet.
+2. Private Subnet = no access to the public internet. 
+3. Both public subnet and private subnet can access each other if they are in same vpc network.
+4. If public subnet wants to access the private subnet then it must goes from the "NAT Gateway (Network Address Translation)"
+
+``` IMPORTANT :- 
+5. When we create a subnet either by the name of public or private it will be private initally until we give the access of "Internet Gateway" so create the Internet Gateway so that public request can come from this.
+6. So now we have to route the incoming request for this, we have to create the route table and also do the subnet association by telling this which subnet you will have to go on. 
+
+** Pictorial representation can be seen in "vpc network.png" and "network diagram.png" image.
+
+------------------------------------------------------------
+
+- Users can't access directly to the vpc public subnets what they do mainly first their request goes to "Internet Gateway" then it routes to the public subnet of the vpc network.
+- Then internet gateways watch in the "Route tables"  -->> Route network traffic to resources
+
+** Pictorial representation can be seen in "vpc network.png" and "network diagram.png" image.
+
+------------------------------------------------------------
+
+. CIDR = Classless Inter-Domain Routing is an IP address allocation method that improves data routing efficiency on the internet. So technically when we create our own VPC so the IP we assign can be from the CIDR.
+
+. cidr.xyz <<-- web link so basically on this website it would tell you that how much IP addresses you got, 
+Copy this from the cidr.xyz link -->>  10.88.135.144/28 and this will give you the 16 IP addresses out of 5 AWS reserved IP addresses for themselves. 
+
+Same like for different IP
+- 10.0.0.0/16 -->> 65,000 IP addresses we got, that means 65,000 devices we can run.
+- 10.0.0.0/24 -->> 256 IP addresses
+
+- Tenancy means - dedicated services which is costly , so we just go with default.
+------------------------------------------------------------

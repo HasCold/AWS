@@ -1,0 +1,22 @@
+-------------------------------- AWS EC2 -----------------------------
+
+EC2 => Elastic Compute Cloud
+
+Elastic means in cloud whenever u need to expand your infrastructure they can elastically elongated and also come in the same old size in terms of infra. (Auto-Scale)
+
+- To login in your EC2 instance via from our system to the remote location server we have to do with OpenSSH protocol (Client to connect with Server) -> secure-shell (ssh)
+- Generate Private and Public keys
+- Whom they have private key, they can request to the public key means the private key is on our system and from that we can request to the remote server. 
+
+
+------------------- EC2 Networking 
+If we want to 
+- SSH : port 22
+- HTTP : port 80
+- HTTPS : port 443
+-----------------------------------
+
+. sudo apt-get update --->> To update the packages in aws ubuntu server.
+. sudo systemctl restart nginx --->> To restart the nginx.
+
+nginx by-default will run the web-page on port number : 80.

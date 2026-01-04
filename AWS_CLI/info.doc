@@ -1,0 +1,31 @@
+------------------------------ AWS CLI -----------------------------------
+If we have to access the aws services via command line so we have a tool called AWS CLI.
+
+- FOR AWS CLI based access we have to get the token; 
+Access Key and Private Key are the keys to access the data or bucket.
+
+AWS CLI V2 guide 
+
+- SSH Connect establish with EC2 instance.
+- Install the unzip package in AWS ECS instance via the AWS CLI. 
+https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+
+- In our system, we installed the AWS CLI but that AWS CLI will interact which AWS account so for that we have to confiure the the credential 
+
+e.g. :- 
+ubuntu@ip-172-31-4-87:~$ aws s3 ls
+Unable to locate credentials. You can configure credentials by running "aws login".
+
+ubuntu@ip-172-31-4-87:~$ aws configure
+Acc Key ID [None]: 
+Sec Access Key [None]:
+Default region name [None]:
+Default output format [None]:
+
+- Now If I have to access one of the aws service like S3 and want to list down the buckets name so can be able to done this now;
+ubuntu@ip-172-31-4-87:~$ aws s3 ls
+2025-12-14 16:41:53 aws-learning-session-b
+2025-09-27 08:07:59 dev-media-audios-bucket
+2025-09-27 08:05:56 dev-media-documents-bucket
+2025-09-27 08:07:04 dev-media-videos-bucket

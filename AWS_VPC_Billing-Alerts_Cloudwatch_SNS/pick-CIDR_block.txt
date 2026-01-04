@@ -1,0 +1,11 @@
+// How to pick a CIDR block effectively
+
+Answer :- 
+
+- When creating a VPC so try to pick the big CIDR block range around 65,000 device count from this link -->> cidr.xyz.
+- So in that case when u have to create subnet either multiple public or private so u can distribute the IP's from the big CIDR block range which is of the 65,000 count devices.
+
+CIRD Selection :-
+. VPC has CIDR block range of 192.0.0.0/24 (65k devices or IP addresses)
+. Public Subnet = 192.0.0.0/24, it means First Usable IP: 192.0.0.1, Last Usable IP: 192.0.0.254
+. Private Subnet = 192.0.1.0/24, it means First Usable IP: 192.0.1.1, Last Usable IP: 192.0.1.254

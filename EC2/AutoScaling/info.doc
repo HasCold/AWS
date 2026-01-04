@@ -1,0 +1,35 @@
+
+---------------------- Main Components -----------------
+- WAF (Web Application Firewall) - Security for checking the incoming request are from users or bots.
+
+- Load Balancer(Elastic Load Balancer) - If u select "internet facing" option instead of "internal" in the Policy Tracking section while in the process of Auto-Scaling Group so this will give you the public-facing-url. e.g. This is a DNS name :- aws-learning-session-alb-1148912274.ap-south-1.elb.amazonaws.com  
+
+- Target Group : 80 default port which means request comes to this by load balancer will distribute further requests  
+
+- Auto Scaling Group
+
+-----------------------------------------------------------------
+
+------------------------ Load Balancers ----------------------
+- There are two type of load balancer
+1. Application Load Balancer
+1. Network Load Balancer
+
+- OSI Model
+1. Application Load Balancer staged on to the 7 layer of the OSI (Applicaion Layer). -->> HTTPS/HTTP
+
+2. Network Load Balancer staged on to the 4 layer of the OSI (Network Layer). --->> TCP,UDP,TLS
+
+-----------------------------------------------------------------
+
+-------------------- AWS Load Balancer Concept --------------------------
+
+Remember :- 
+
+1. Minimum Size :- The minimum requirement that we need when there is no traffic.
+
+2. Desired Capacity :- The normal application is running so then how much instances are always running that is desired.
+
+3. Maximum Size :- When there is an spike in the traffic so how much instance can scale upto the size. 
+
+-------------------------------------------------------------------------

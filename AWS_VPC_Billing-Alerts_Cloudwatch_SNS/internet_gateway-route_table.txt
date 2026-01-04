@@ -1,0 +1,8 @@
+
+                                      ------->>> VPC Attach   
+                                    ^
+                                    |
+                                    | 
+Public Internet Access --->>> Internet Gateway  --->>> Route Table --->>> Subnet Association --->>> Public Subnet (EC2)
+
+- If u are connecting the Route Table with Internet Gateway and u are using this destination 0.0.0.0/0 , so it means this is publically access to anywhere around the world.

@@ -1,0 +1,22 @@
+----------------- Infrastructure As A Service --------------------
+
+1. Databases (50GB Hard Disk)
+2. EC2 Servers (8GB RAM, 2 Core CPU)
+3. eg :- RDBMS, NRDBMS
+
+
+-------------------- Platform As A Service ----------------------
+
+1. Lambda Service (where u have to run your code directly and this will be all managed, scaled by AWS)
+2. ECS => Elastic Container Service (create docker container and put into the ECS so it will be auto-scaled, managed by AWS).
+3. EKS => Elastic Kubernetes Service (runs your kubernetes cluster in AWS managed EKS service).
+
+So all above becomes your Platform as a Service.
+
+
+----------------------- Software As A Service ------------------------
+
+1. Gmail is Software as a Service
+2. Learning Management System (LMS) plaform is also an example of Software as a Service.
+
+Some services are provided by AWS under Software as a Service.

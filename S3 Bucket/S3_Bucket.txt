@@ -1,0 +1,11 @@
+--------------------------------- S3 Bucket ----------------------------
+Bucket is simply a container where we put down the files into that container like images, files, audio, and videos etc.
+
+- Each object within a bucket is stored as a key-value pair.
+eg :- 
+. key is the object name (which can contain slashes /).
+. value is the content of the object (the file / data itself).
+
+------------------------------- Maximum Object Size -----------------------------
+. 5TB (TeraBytes) is the maximum size for a single object in Amazon S3.
+. Multipart upload is recommended for objects larger than 5GB. 

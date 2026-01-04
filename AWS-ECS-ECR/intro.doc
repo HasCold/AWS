@@ -1,0 +1,39 @@
+-----------------------------------
+
+- AWS ECS -->> Fargate(Serverless), EC2 instances : Amazon fully managed the containers. 
+
+ECR = Elastic Container Registry -->> Push the images to this registry just like we have hub.docker.com
+ECS = Elastic Container Service -->> and then push those images and run to the ECS.
+
+-----------------------------------
+
+Setup the EC2 instance where we can take the pull in ECR :
+1. sudo apt-get update
+2. sudo apt install docker.io
+
+``` Ubuntu user has no access or permission of docker so we have to add them in docker group
+check via command :- 
+3. whoami
+4. sudo usermod -aG docker ubuntu --->>> user modify -a = append to, G = Group in docker which user = ubuntu
+5. sudo reboot -->> one time log-in again
+
+``` Now install aws-cli v2
+
+-----------------------------------
+
+------------------------------------ AWS ECS Cluster --------------------------------
+
+- Docker file se banti ha => docker image => docker image se chalta ha docker container => container deploy hota ha ECS 
+- ECS Cluster => Task : Definition :- which image, server, RAM, storage and environment variable will be used so these things will be defined as a Task for running ECS Cluster.
+
+- Exactly multiple container will be run in a same cluster. 
+
+``` ECS Cluster Creation :-
+1. So after creating the ecs cluster
+2. Create new task -->> so for new task create -->> New Task Definition (means define cpu, architecture, memory)
+3. Also create task role via IAM when in the process of "Task Definition Section".
+4. Give the container name like when we run the container from docker so the command will look like this 
+--->>> docker run -p 8000:8000 --name node-container-app:latest
+5. So give the name node-container-app
+
+6. So now after that if any problem occurs in accessing the applicaiton running on port:8000 so go to the ENI(Elastic Network Interface) id --->> go to the security groups --->> edit inbound rules --->> add rules --->> port:8000 ---->>> save changes --->> Then the port:8000 on public IP will definitely run 13.202.89.16:8000

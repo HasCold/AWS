@@ -1,0 +1,3 @@
+On Demand Instance :- Means u came and purchase one EC2 instance at the rate of 0.005$/hr. Whenever there is a priority requirement and we need those dedicated servers so use on-demand. Always available
+
+Spot Instance :- Means u want instance on a cheaper rate like 0.004$/hr so u can do the bid on the instances so if available it will assign it to you that's called Spot Instance.

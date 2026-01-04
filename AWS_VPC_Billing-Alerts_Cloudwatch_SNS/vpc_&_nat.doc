@@ -1,0 +1,118 @@
+## 1️⃣ NAT (Network Address Translation) — *Internet access for private resources*
+
+### **Purpose**
+
+NAT is used when **resources in a private VPC subnet need to access the internet**, **without being exposed to the internet**.
+
+### **Think of it like**
+
+> People inside an office can go outside, but outsiders can’t come inside.
+
+### **What NAT does**
+
+* Allows **outbound internet traffic** from **private instances**
+* Blocks **incoming internet traffic**
+* Hides private IPs behind a public IP
+
+### **Common AWS example**
+
+* EC2 in a **private subnet**
+* Needs to:
+
+  * download OS updates
+  * pull Docker images
+  * call external APIs
+* Uses **NAT Gateway** in a **public subnet**
+
+### **Traffic flow**
+
+```
+Private EC2 → NAT Gateway → Internet
+Internet ❌→ Private EC2
+```
+
+### **Key points**
+
+✔ One-way (outbound only)
+✔ Used for **internet access**
+✔ Not for VPC-to-VPC communication
+❌ Cannot accept inbound connections
+
+---
+
+## 2️⃣ VPC Peering — *Private communication between VPCs*
+
+### **Purpose**
+
+VPC Peering is used to **connect two VPCs privately** so they can talk to each other **using private IPs**.
+
+### **Think of it like**
+
+> A private tunnel between two offices — no public road involved.
+
+### **What VPC Peering does**
+
+* Enables **VPC → VPC communication**
+* Traffic **never goes to the internet**
+* Works across:
+
+  * Same account
+  * Different AWS accounts
+  * Different regions
+
+### **Common AWS example**
+
+* One VPC for **payments**
+* One VPC for **settlement**
+* Services talk securely using **private IPs**
+
+### **Traffic flow**
+
+```
+VPC A (10.0.0.0/16) ↔ VPC B (10.1.0.0/16)
+```
+
+### **Key points**
+
+✔ Two-way private communication
+✔ No internet involved
+✔ Low latency, secure
+❌ No transitive routing (A ↔ B ↔ C won’t work automatically)
+
+---
+
+## 🔥 NAT vs VPC Peering (Quick Comparison)
+
+| Feature                  | NAT             | VPC Peering       |
+| ------------------------ | --------------- | ----------------- |
+| Main use                 | Internet access | VPC-to-VPC access |
+| Direction                | Outbound only   | Two-way           |
+| Uses public IP           | Yes             | No                |
+| Private IP communication | ❌               | ✅                 |
+| Internet involved        | Yes             | No                |
+| Security exposure        | Hidden          | Fully private     |
+
+---
+
+## 🧠 When to use **what**?
+
+### ✅ Use **NAT** when:
+
+* Private EC2 needs internet
+* You don’t want inbound access
+* Updating packages, calling public APIs
+
+### ✅ Use **VPC Peering** when:
+
+* Two internal systems must talk
+* Microservices across VPCs
+* No internet exposure allowed
+
+---
+
+## ⚡ Real-world combo (very common)
+
+Most production setups use **both**:
+
+* **VPC Peering** → internal service-to-service communication
+* **NAT Gateway** → controlled internet access for private subnets

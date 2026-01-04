@@ -1,0 +1,30 @@
+--------------------------- VPC Peering -------------------------------
+
+- When u create subnets in VPC's either public or private and u want to communicate between two vpc's so do the VPC peering create NAT Gateway,
+
+- After creating the security group when try to ping one EC2 instance to another EC2 instance which is both in isolated VPC environment so we can not see any request coming from that one server instance bc of the security groups is one of the additional security layer.
+- So for that we have to create the security group.
+- Go to EC2 instance -->> 
+select vpc-test-instance -->> 
+Security Groups Section -->> 
+Click on security group (sg-0ed249b324035cfc2 - launch-wizard-2) -->> 
+add rule -->> 
+All ICMP-IPv4(Internet Control Message Protocol) , add CIDR Block range for both testing and prod-vpc instance as well.
+-->> Save Rule Click Button
+
+- Now do the same above ^ things as well for the "prod-aws-learning-session-instance".
+
+------------ Modify the Route Table
+- After setting up the vpc peering and security groups
+- Modify the route table because request goes from the internet-gateway to the route table we have to tell the test-route-table and we should add the prod-aws-learning-session-route-table means add the peering-connection and destination will be set to prod CIDR block range (192.0.0.0/24).
+
+Now do the exact same thing for prod-route-table means add the test-route-table into prod one's 
+- Destination will be set to test CIDR block range (10.0.0.0/24).
+-------------
+Now after that when u try to ping like this way : ping <private-ip-address-of-ec2-instance> -->> ping 10.0.0.28    
+
+- NAT = Network Address Translation Gateway
+
+----------------------------------------
+
+. Pictorial representation can be seen in "network diagram.png"

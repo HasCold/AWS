@@ -1,0 +1,4 @@
+AWS has criteria that if any region has atleat 3 or more data centers in that place so it can be called as the Availability Zone.
+
+Example :- 
+1. India has 2 regions (Mumbai and Hyderabad) which has total 6 AZ (Availability Zones) or u can say 6 data centers which offers the AWS services or resources.

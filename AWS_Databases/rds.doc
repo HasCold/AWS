@@ -1,0 +1,51 @@
+----------------------- AWS Aurora RDS -------------------
+
+- DB Clusters : A group of database we created mostly this will be for the production use case.
+
+- Snapshot : AWS will take a snapshot or backup of our database periodically. 
+
+-----------------------------------------------------------
+
+------------------ Mostly Used in Production -----------------------
+
+- Show only versions that support the Multi-AZ DB cluster (Option)
+Info
+Create a A Multi-AZ DB cluster with one primary DB instance and two readable standby DB instances. Multi-AZ DB clusters provide up to 2x faster transaction commit latency and automatic failover in typically under 35 seconds.
+
+--------------------------------------------------------------------
+
+RDS - Free Tier Password = admin2001
+
+--------------------------------------------------------------------
+
+------------------- EC2 connectivity with RDS -----------------------
+
+After doing OpenSSH to your system run this command mysql client :
+mysql -u admin -h database-1.cvqcaq2ae5zr.ap-south-1.rds.amazonaws.com -P 3306 -p
+
+- OR
+
+We can also make a secure connection between EC2 and RDS via IAM role
+- Create Role 
+- AWS Service 
+- Policy Assign (RDSFullAccess, CloudWatchEventsFullAccess = This access is available in RDS so also assign this policy to EC2 as well)
+
+--------------------------------------------------------------------
+
+------------------- Interact with Database --------------------------
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.02 sec)
+
+mysql> create database aws;
+Query OK, 1 row affected (0.02 sec)
+
+mysql

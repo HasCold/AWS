@@ -1,0 +1,12 @@
+
+BluePrint of an existing running server so what we can do make a template or blueprint of them like what steps or configuration required for building them make a template so that next time we can just launch that template to directly run the EC2 instance. 
+
+EC2 ------------>>>> AM-1
+    ------------>>>> Key
+    ------------>>>> Instance Type
+    ------------>>>> Network
+    ------------>>>> Storage
+
+-------------------- On AWS Cloud --------------------
+
+You can watch the templates on EC2 Instance --->>> Launch Templates

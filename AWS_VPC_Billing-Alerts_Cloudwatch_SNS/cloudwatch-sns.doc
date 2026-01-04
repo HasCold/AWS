@@ -1,0 +1,12 @@
+------------------ Cloud Watch -----------------------
+Cloudwatch :- Cloudwatch is basically a logging, monitoring amd billing service.
+
+- Billing and Cloudwatch services can only be find or present in the "North Virginia Region".
+
+- If u want that if the bill increased upto the 10$ amount so will notify you via email so this can be done by the cloudwatch billing alarm. 
+
+-------------------------------------------------------
+
+
+------------------ SNS (Simple Notification Service) -----------------------
+. We have to configure both sns and cloudwatch to set or create up alarm.

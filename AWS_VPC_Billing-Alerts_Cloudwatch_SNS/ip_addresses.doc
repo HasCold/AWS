@@ -1,0 +1,129 @@
+
+---
+
+## First: what is an IP address?
+
+An **IP address** is like a **home address for a device on the internet**.
+
+* Your laptop, mobile, server, router → all need an IP
+* It helps data know **where to go and where it came from**
+
+📦 *No IP address = no internet communication*
+
+---
+
+## What is IPv4?
+
+**IPv4 = Internet Protocol version 4**
+
+It’s the **older and most common** type of IP address.
+
+### Example:
+
+```
+192.168.1.1
+8.8.8.8
+172.16.0.5
+```
+
+### How it looks:
+
+* 4 numbers
+* Each number: 0–255
+* Written with dots (`.`)
+
+### Problem with IPv4 ❌
+
+IPv4 can only create about **4.3 billion addresses**.
+
+➡️ With phones, laptops, servers, IoT devices, cloud…
+**We ran out of IPv4 addresses**.
+
+That’s the main reason IPv6 exists.
+
+---
+
+## What is IPv6?
+
+**IPv6 = Internet Protocol version 6**
+
+It’s the **newer version** designed to fix the IPv4 shortage.
+
+### Example:
+
+```
+2001:0db8:85a3:0000:0000:8a2e:0370:7334
+```
+
+### How it looks:
+
+* Uses **hexadecimal** (0–9, a–f)
+* Written with colons (`:`)
+* Much longer than IPv4
+
+### Big advantage of IPv6 ✅
+
+IPv6 can create:
+
+> **340 undecillion addresses**
+> (that’s more than enough for every device on Earth… and more)
+
+---
+
+## Simple comparison
+
+| Feature       | IPv4              | IPv6               |
+| ------------- | ----------------- | ------------------ |
+| Version       | Old               | New                |
+| Address size  | 32-bit            | 128-bit            |
+| Example       | `8.8.8.8`         | `2001:db8::1`      |
+| Address count | ~4 billion        | Almost unlimited   |
+| Still used?   | Yes (very common) | Yes (growing fast) |
+
+---
+
+## Real-life analogy 🏠
+
+* **IPv4** → Like **old phone numbers** with limited digits
+* **IPv6** → Like **modern phone numbers** with country codes and extra digits
+
+More digits = more unique numbers.
+
+---
+
+## Why do we still use IPv4?
+
+Good question 👇
+
+* Old systems still depend on IPv4
+* IPv6 migration takes time
+* Tools like **NAT (Network Address Translation)** help reuse IPv4 addresses
+
+So today, the internet runs in a **dual-stack** mode:
+
+> **IPv4 + IPv6 together**
+
+---
+
+## In cloud & DevOps (important for you)
+
+Since you work with **AWS / backend / networking**:
+
+* EC2, Load Balancers, Kubernetes → support both IPv4 & IPv6
+* AWS often gives:
+
+  * **Public IPv4** (sometimes paid)
+  * **Free IPv6**
+* Modern systems prefer IPv6, but **IPv4 is still unavoidable**
+
+--------------------------------------------------------------------
+
+Real-life analogy 🏢
+
+Imagine an office building:
+
+Private IP → extension number inside the office
+Public IP → main office phone number
+
+Employees call each other using extensions
+External people call the main number

@@ -1,0 +1,7 @@
+-------------------------- S3 Bucket Policies -----------------------
+
+. Permission provided by the s3 bucket policies.
+
+. You can use AWS Policy Generator to create a custom policy or you can manually write the policy in JSON format.
+ - GetObject: Used to retrieve or download files from S# bucket.
+ - PutObject: Used to upload or add files into S3 bucket.
