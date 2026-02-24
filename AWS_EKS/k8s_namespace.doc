@@ -1,0 +1,6 @@
+------------------- Namespaces --------------------
+
+- Docker containers are running in the cubical which means pods (Pod is the smallest unit of k8s).
+- Pods -->> docker containers, podman container, docker d.
+
+. Documentation :- https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/

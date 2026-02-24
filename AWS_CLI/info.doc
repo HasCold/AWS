@@ -18,8 +18,8 @@ ubuntu@ip-172-31-4-87:~$ aws s3 ls
 Unable to locate credentials. You can configure credentials by running "aws login".
 
 ubuntu@ip-172-31-4-87:~$ aws configure
-Acc Key ID [None]: 
-Sec Access Key [None]:
+AWS Acc Key ID [None]:  
+AWS Sec Access Key [None]:  
 Default region name [None]:
 Default output format [None]:
 

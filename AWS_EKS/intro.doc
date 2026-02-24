@@ -1,0 +1,75 @@
+------------------------ How to Study K8s -------------------------
+
+- There are 3 ways to learn the kubernetes.
+1. Run kubernetes on your Local system (Minikube).
+2. Run kubernetes on Cloud environment (AKS, EKS, GKE).
+3. Run kubernetes on PlayGround (Killer coda, k8s playground).
+4. Also can run the kubernetes on-premise but now this is not popular way (Kubeadm).
+
+---------------------------------------------------------
+
+------------------------ EKS ---------------------------
+- Kubernetes is a container orchestration platform to manage the docker containers.
+- AWS EKS is an amazon managed platform as a service (PAAS) which basically allows you to deploy your application on to the kubernetes cluster.
+
+- This is the starter repo for kubernetes where u can see the all the way of setting up. https://github.com/LondheShubham153/kubestarter
+
+---------------------------------------------------------
+
+------------------------ Concept of K8s ---------------------------
+- Cluster :- A group of nodes, group together.
+
+How many nodes or servers can be in kubernetes cluster ?
+- With minimum 2 nodes or servers we can create the kubernetes cluster.
+
+- Kubernetes ka kaam ha apne group of nodes ya servers (Cluster) ma docker containers ko run krna.
+
+---------------------------------------------------------
+
+------------------------ Architecture of K8s ---------------------------
+- Architecture is discussed in detailed in personal notebook.
+
+- Pods :- pod is one of the smallest unit of kubernetes in which the docker containers are running.
+
+---------------------------------------------------------
+
+--------------------- EKS CTL ------------------------------------
+
+- After creating a cluster via the EKS CTL if we have to add one other things in the cluster like adding the monitoring, security etc we can addon these things via the "eksctl utils".
+
+``` This oidc connect provider is used to communicate for thrid party service. 
+eksctl utils associate-iam-oidc-provider \
+    --region us-west-2 \
+    --cluster my-cluster \
+    --approve
+
+IMPORTANT :- 
+1. EKSCTL is used to create the kubernetes cluster or environment.
+2. KUBECTL(Kube Controller) is used to control the kubernetes cluster.
+
+---------------------------------------------------------
+
+--------------------- Cluster --------------------------
+
+- In AWS, the control plane (Master Node) will be managed by EKS cluster.
+
+- How to access the kubernetes cluster via kubectl on our local instance ?
+aws eks update-kubeconfig --region ap-south-1 --name aws-eks-learning-cluster
+
+---------------------------------------------------------
+
+--------------------- Kubectl --------------------------
+
+- kubectl get nodes
+- kubectl get pods --all-namespaces
+
+---------------------------------------------------------
+
+--------------------- kubestarter Repo --------------------------
+
+- https://github.com/LondheShubham153/kubestarter
+
+
+- https://github.com/LondheShubham153/kubestarter/blob/main/eks_cluster_setup.md
+
+---------------------------------------------------------

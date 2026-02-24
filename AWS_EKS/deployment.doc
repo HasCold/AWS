@@ -1,0 +1,75 @@
+--------------------- Deployment -----------------------
+
+. Deployment is a configuration of a desired state. 
+. Means we say that on kubenetes cluster we need to 2 replica of java-namespace and if by chance 1 from the 2 containers is crashed so scheduler will provisioned the another pod in that particualr namespace.  
+
+. Service Proxy has an address of the deployment.
+
+Users --->> Service Proxy --->> Deployement.
+
+IMPORTANT :- 
+- Everything in k8s is a manifest file. Even if u want to make the cluster, namespace or pods.
+
+
+------------------------------------------------------
+
+-------------------- Docs Link ----------------------------
+
+. You can see how to write the manifest file for kubernetes in going to the documentation for every thing like pods, namespace etc.
+e.g. :- https://kubernetes.io/docs/tasks/administer-cluster/namespaces/#creating-a-new-namespace
+
+------------------------------------------------------
+
+-------------------- Kubectl ----------------------------
+
+There are two ways of making the things in k8s cluster either from command line or from the manifest file.
+
+- kubectl apply -f namespace.yml (Apply namespace manifest file)
+- kubectl apply -f pod.yml (Apply pod manifest file)
+
+Some commands of kubectl :- 
+1. kubectl create namespace nginx
+2. kubectl delete namespace nginx
+
+------------------------------------------------------
+
+------------------- Deployment Manifest File --------------------
+- Everything in K8s is a manifest file.
+
+// Any pod that matches the label app nginx make it to 3 replicas.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: dev // -->> (all deployment or pods will be created in the same namespace).
+  labels:
+    app: nginx
+
+spec: // --->> Deployment Specification
+  replicas: 3 
+  selector: // --->> Criteria
+    matchLabels:
+      app: nginx
+
+  // nginx pod template below would be match on the basis of defined labels in selector criteria, this is optional either  
+  // it could be made in new pod file or would be like this in the same file
+  template: // --->> (Read as a Pod template, metadata labels would be match as per the criteria).
+    metadata:
+      name: nginx
+      namespace: dev
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+---------------------------------------------------------------
+
+------------------- Validate Manifest File via Cmd --------------------
+
+kubectl apply --validate=true --dry-run=client --filename=file.yaml
+
+---------------------------------------------------------------
