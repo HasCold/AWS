@@ -44,8 +44,8 @@ eksctl utils associate-iam-oidc-provider \
     --approve
 
 IMPORTANT :- 
-1. EKSCTL is used to create the kubernetes cluster or environment.
-2. KUBECTL(Kube Controller) is used to control the kubernetes cluster.
+1. EKSCTL is a tool used to create the kubernetes cluster or environment.
+2. KUBECTL(Kube Controller) is a tool used to control the kubernetes cluster components.
 
 ---------------------------------------------------------
 

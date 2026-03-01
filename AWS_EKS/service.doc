@@ -1,0 +1,53 @@
+-------------------------- Service ----------------------------
+
+. So we have created the pod, namespace and their deployments but how can the external world access to the pod.
+. In Kubernetes, a Service is a method for exposing a network application that is running as one or more Pods in your cluster.
+
+
+-->> Nginx port : 80 --->>> bind to Load Balancer --->>> where user comes 
+
+
+There are three type of services :- 
+1. Cluster IP
+2. NodePort
+3. LoadBalancer
+4. ExternalName 
+
+-------------------------- Manifest file ------------------------- 
+
+apiVersion: v1
+kind: Service
+metadata:
+    name: nginx-service
+    namespace: nginx
+    labels:  // -->> Deployment will be identify using this label 
+        app: nginx
+
+spec:
+    type: LoadBalancer
+    selector: // -->> Deployment will be identify using this label
+        app: nginx
+    ports:
+        - protocol: TCP
+          port: 80 // -->> Your service port means when u enter the url www.google. 
+                      com:80
+          targetPort: 80  // -->> Your container port, Traffic is forwarded to:
+                            PodIP:80 
+
+-----------------------------------------------------------------------
+
+-------------------- Important Commands -------------------
+
+- We can also check that service is accessible via
+. kubectl get service -n nginx
+
+- If want to spin up the all manifest file via one command
+. kubectl apply -f .
+
+- How to delete the cluster resources before deleting the cluster in one command 
+. kubectl delete -f .
+
+- Delete the whole cluster in one command after deleting their resoruces 
+. eksctl delete cluster --name=aws-eks-learning-session --region=ap-south-1
+
+-----------------------------------------------------------------------
