@@ -1,0 +1,97 @@
+KIND := Kubernetes Running In Docker 
+
+- Refer the docs for installation setup of KIND on killercoda.com or any cloud platform 
+Link :-
+https://github.com/LondheShubham153/kubestarter/blob/main/kind-cluster/install.sh
+
+------------------- File permission ---------------------------
+
+- chmod 777 install_kind.sh
+
+chmod 777 install_kind.sh is a Linux/Unix file permission command.
+
+1️⃣ chmod
+
+chmod stands for change mode.
+It is used to change permissions of a file or directory.
+
+2️⃣ 777
+
+This number represents permissions for three groups:
+
+Group	Number	Meaning
+Owner	7	Read + Write + Execute
+Group	7	Read + Write + Execute
+Others	7	Read + Write + Execute
+
+------------------------------------------------------------
+
+------------------- K8s Cluster Manifest file Setup ---------------------------
+
+. Create dir /config -->> there create file -->> vim config.yml
+. Everything in K8s is manifest file. 
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+
+nodes:
+- role: control-plane
+  image: kindest/node:v1.35.2
+- role: worker
+  image: kindest/node:v1.35.2
+- role: worker
+  image: kindest/node:v1.35.2
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
+
+------------------------------------------------------------
+
+------------------- KIND Cluster Creation ---------------------------
+
+- Then Cluster Creation via KIND :-
+kind create cluster --name=k8s-learning-cluster --config=config.yml
+
+------------------------------------------------------------
+
+------------------ Create Folder k8s_in_one_shot (Namespace, Pods, Deployement, Service) ----------------------
+
+- Create k8s_in_one_shot dir there u will be creating the all mainfest files.
+
+---------------------- Then create namespaces.yml file 
+
+--> vim namespace.yml
+--> 
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: nginx
+
+- kubectl apply -f namespace.yml
+
+
+---------------------- Then create pod.yml file 
+
+--> vim pod.yml
+-->
+kind: Pod
+apiVersion: v1
+metadata:
+  name: nginx-pod
+  namespace: nginx
+
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
+
+- kubectl apply -f pod.yml
+- kubectl exec -it nginx-pod -n nginx (-n = namespace) -- bash 
+
+------------------------------------------------------------

@@ -29,7 +29,7 @@ How many nodes or servers can be in kubernetes cluster ?
 ------------------------ Architecture of K8s ---------------------------
 - Architecture is discussed in detailed in personal notebook.
 
-- Pods :- pod is one of the smallest unit of kubernetes in which the docker containers are running.
+- Pods :- pod is one of the smallest deployment unit of kubernetes in which the docker containers are running.
 
 ---------------------------------------------------------
 
