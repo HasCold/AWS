@@ -24,11 +24,14 @@ Owner	7	Read + Write + Execute
 Group	7	Read + Write + Execute
 Others	7	Read + Write + Execute
 
+Then run the ./install_kind.sh file to complete the setup
+
 ------------------------------------------------------------
 
 ------------------- K8s Cluster Manifest file Setup ---------------------------
 
 . Create dir /config -->> there create file -->> vim config.yml
+. You can also refer the configuration file -->> https://github.com/LondheShubham153/kubestarter/blob/main/kind-cluster/kind-config.yml
 . Everything in K8s is manifest file. 
 
 kind: Cluster
@@ -36,11 +39,11 @@ apiVersion: kind.x-k8s.io/v1alpha4
 
 nodes:
 - role: control-plane
-  image: kindest/node:v1.35.2
+  image: kindest/node:v1.35.0
 - role: worker
-  image: kindest/node:v1.35.2
+  image: kindest/node:v1.35.0
 - role: worker
-  image: kindest/node:v1.35.2
+  image: kindest/node:v1.35.0
   extraPortMappings:
   - containerPort: 80
     hostPort: 80
@@ -69,7 +72,7 @@ kind create cluster --name=k8s-learning-cluster --config=config.yml
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: nginx
+  name: nginx-dev
 
 - kubectl apply -f namespace.yml
 
@@ -82,7 +85,7 @@ kind: Pod
 apiVersion: v1
 metadata:
   name: nginx-pod
-  namespace: nginx
+  namespace: nginx-dev
 
 spec:
   containers:
@@ -92,6 +95,157 @@ spec:
     - containerPort: 80
 
 - kubectl apply -f pod.yml
-- kubectl exec -it nginx-pod -n nginx (-n = namespace) -- bash 
+- kubectl delete -f pod.yml
+
+If u want to debug the pod u can try this command and check what is runnning in pod :-
+1. kubectl exec -it nginx-pod -n nginx (-n = namespace) -- bash 
+2. kubectl describe pod/nginx-pod -n nginx-dev
+
+------------------------------------------------------------
+
+-------------------- Debugging Logs to check pods -----------------------
+- kubectl describe pod/nginx-pod -n nginx-dev
+------------------------------------------------------------
+
+----------------------- Then create deployment.yml file
+
+Before write any manifest file u can also confirm or check it on kubernetes offical docs like :-  kubernetes deployment
+
+- Important :- What is Label and Selector
+Label :- We will give label to every pod. (appName) 
+Selector :- Selectors in a Deployment are used to match and manage pods whose labels match the specified criteria.
+
+---> vim deployment.yml
+--->
+kind: Deployment
+apiVersion: apps/v1
+metadata: 
+  name: nginx-deployment
+  namespace: nginx-dev
+
+spec:
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: nginx
+
+// pod.yml file basically if u don't write separately u can also do it here as well (template and spec)
+  template:
+    metadata:
+      name: nginx-dep-pod
+      labels:
+        app: nginx
+
+    spec:                  
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports: 
+        - containerPort: 80
+
+---> Then run this command : kubectl apply -f deployment.yml
+
+---> kubectl get deployment -n nginx-dev
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   2/2     2            2           53s
+
+---> Scale up or make the replicas of pod in specified deployment
+---> kubectl scale deployment/nginx-deployment -n nginx-dev --replicas=5
+------------------------------------------------------------
+
+
+---------------- Deployment Rolling Update Command ---------------------------
+
+. ReplicaSet -> bhi replication controller ko control krte ha.
+. StatefulSet -> bhi replicas maintain krte ha. 
+. Deployement -> bhi apke replicas maintain krte ha aur sath ma apke rolling update bhi maintain krte ha.
+
+
+// Let suppose we want to update or shift to the previous nginx image version.
+---> kubectl set image deployment/nginx-deployment -n nginx-dev nginx=1.27.3
+
+// Here u can see the rolling update feature if u got the error still the previous images are running and the updates were sequentially affected.
+---> kubectl get pods -n nginx-dev
+NAME                                READY   STATUS         RESTARTS   AGE
+nginx-deployment-59f86b59ff-5pjgk   1/1     Running        0          93s
+nginx-deployment-59f86b59ff-v7fq9   1/1     Running        0          93s
+nginx-deployment-849c87fc69-pjgd7   0/1     ErrImagePull   0          12s
+
+------------------------------------------------------------
+
+-------------------------- Replica Set (Optional) --------------------------------
+
+. In deployment we can update, scale or can do rolling update things but in replicaset we can't do these things that's why deployment is too flexible.
+
+---> vim replicaset.yml
+---> 
+kind: ReplicaSet
+apiVersion: apps/v1
+metadata: 
+  name: nginx-replicasets
+  namespace: nginx-dev
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+
+  template:
+    metadata:
+        name: nginx-rep-pod
+      labels:
+        app: nginx
+
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+
+. Then run kubectl apply -f replicaset.yml
+
+------------------------------------------------------------
+
+-------------------------- Daemon Set (Optional) ---------------------------------
+
+. Ensure krta ha har node pr ak replica chalta rahe.
+. Command :- to know which pod is assign on which node.
+
+root@controlplane:~/k8s_cluster$ kubectl get pods -n nginx-dev -o wide
+NAME                                READY   STATUS    RESTARTS   AGE   IP            NODE                           NOMINATED NODE   READINESS GATES
+nginx-deployment-74dfc97b57-btl8v   1/1     Running   0          18s   10.244.1.9    k8s-learning-cluster-worker2   <none>           <none>
+nginx-deployment-74dfc97b57-s6msp   1/1     Running   0          18s   10.244.1.10   k8s-learning-cluster-worker2   <none>           <none>
+
+---> vim daemonset.yml
+--->
+kind: DaemonSet
+apiVersion: apps/v1
+metadata: 
+  name: nginx-daemonsets
+  namespace: nginx-dev
+
+spec:
+  selector: 
+    matchLabels:
+      app: nginx
+
+  template:
+    metadata:
+        name: nginx-dmn-pod
+      labels:
+        app: nginx
+
+    spec:                  
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports: 
+        - containerPort: 80
+
+------------------------------------------------------------
+
+-------------------------- Jobs & Cronjobs --------------------------------
 
 ------------------------------------------------------------
