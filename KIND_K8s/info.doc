@@ -246,6 +246,102 @@ spec:
 
 ------------------------------------------------------------
 
--------------------------- Jobs & Cronjobs --------------------------------
+-------------------------- Jobs --------------------------------
+
+---> vim job.yml
+--->
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: job-demo
+  namespace: nginx-dev
+ 
+spec:
+  # How many times u need to run this job 
+  completions: 1
+  # How many parallel node or server u need to execute the job
+  parallelism: 1
+
+  # pod template creation
+  template: 
+    metadata: 
+      name: job-pod-demo
+      labels:
+        app: batch-task
+    spec:
+      containers:
+      - name: batch-container
+        image: busybox:latest    # busybox work is just only running the command
+        command: ["sh", "-c", "echo Hello World Program && sleep 10"] # shell command to print statement 
+      restartPolicy: Never
+
+----> 
+
+Run the command :- kubectl apply -f job.yml
+
+Command to see thier executed logs performed in the job :- 
+- kubectl logs pods/job-demo-gps2z -n nginx-dev
+
+------------------------------------------------------------
+
+-------------------------- Cron Jobs --------------------------------
+
+. Website to set the cron-job scheduling time :- https://crontab.guru/
+
+---> vim cron-job.yml
+--->
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  name: minute-backup
+  namespace: nginx-dev
+
+spec:
+  schedule: "* * * * *"
+  # jobTemplate means one single task template
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          name: minute-backup
+          labels:
+            app: minute-backup
+
+    # jobTemplate container
+        spec:
+          containers:
+          - name: backup-container
+            image: busybox
+            command: 
+            - sh
+            - -c
+            - >
+              echo "Backup Started" ;
+              mkdir -p /backups &&
+              mkdir -p /demo-data &&
+              cp -r /demo-data /backups &&
+              echo "Backup Completed!" ;
+
+        # and whenever you assign data to your container so u need volume for it  
+            volumeMounts:
+            - name: data-volume
+              mountPath: /demo-data
+            - name: backup-volume
+              mountPath: /backups
+        restartPolicy: OnFailure    # if pod fails so restart then only.          
+        volumes:
+          - name: data-volume
+            hostPath:
+              path: /demo-data
+              type: DirectoryOrCreate  # if the job doesn't able to find the relevant directory /demo-data so they will create it  
+          - name: backup-volume
+            hostPath:
+              path: /backups
+              type: DirectoryOrCreate
+
+---> Then run the command kubectl apply -f cron-job.yml
+---> root@controlplane:~/k8s-cluster$ kubectl logs pod/minute-backup-29623482-dqbht -n nginx-dev
+Backup Started
+Backup Completed!
 
 ------------------------------------------------------------
