@@ -129,7 +129,7 @@ spec:
     matchLabels:
       app: nginx
 
-// pod.yml file basically if u don't write separately u can also do it here as well (template and spec)
+# pod.yml file basically if u don't write separately u can also do it here as well (template and spec)
   template:
     metadata:
       name: nginx-dep-pod

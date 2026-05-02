@@ -1,0 +1,129 @@
+Storage: Persistent Volume (PV), Persistent Volume Claims (PV), StorageClasses, ConfigMaps.
+
+If we need to map the container storage with our host(server) storage for the Persistent data storage in case of pod crashes so on auto healing our next container spin-up will have that particular data. so for this behaviour we need this Persistent Volume (PV) and Persistent Volume Claims
+
+--------------------- Persistent Volume ------------------------
+
+---> vim persistentVolume.yml
+--->
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+    name: local-pv
+    namespace: nginx-dev
+    labels:
+        app: local
+spec:
+    capacity: 
+        storage: 1Gi        # 1Gi = 1000MB
+    accessModes:
+        - ReadWriteOnce
+    persistentVolumeReclaimPolicy: Retain  # means the 1Gi storage we allocate to our server will be retained
+    storageClassName: local-storage  # means we are storing the data on our local machine similar we can store on pendrive, cloud storage etc.
+    hostPath:
+        path: /mnt/data
+
+----
+
+root@controlplane:~/k8s_cluster$ kubectl get pv
+NAME       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS    VOLUMEATTRIBUTESCLASS   REASON   AGE
+local-pv   1Gi        RWO            Retain           Available           local-storage   <unset>                          24s
+
+----------------------------------------------------------------
+
+NOTE :-  So the analogy is something like that we have created the persistentVolume on our local machine which is now available but someone need to claim that particular volume so that is your persistent volumen claim
+
+------------------- Persistent Volume Claim ----------------------
+
+---> vim persistentVolumeClaim.yml
+--->
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: local-pvc
+    namespace: nginx-dev
+spec:
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 1Gi  # how much resource storage u want to claim 
+    storageClassName: local-storage
+
+---
+
+Now u can see the persistent volume is claimed
+
+. root@controlplane:~/k8s_cluster$ kubectl get pv
+NAME       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM               STORAGECLASS    VOLUMEATTRIBUTESCLASS   REASON   AGE
+local-pv   1Gi        RWO            Retain           Bound    default/local-pvc   local-storage   <unset>                          14m
+
+. root@controlplane:~/k8s_cluster$ kubectl get pvc
+NAME        STATUS   VOLUME     CAPACITY   ACCESS MODES   STORAGECLASS    VOLUMEATTRIBUTESCLASS   AGE
+local-pvc   Bound    local-pv   1Gi        RWO            local-storage   <unset>                 76s
+
+----------------------------------------------------------------
+
+- Now u can create the deployment.yml file and in which the data will not be deleted if the pod crashes or delete somehow.
+
+---> vim deployment.yml
+--->
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: nginx-deployment
+  namespace: nginx-dev
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+
+  # Pod template
+  template:
+    metadata:
+      labels:
+        app: nginx
+
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:  # nginx container path will be mount to one of the volumentMounts 
+            - mountPath: /var/www/html  # nginx html file exist in this location where the nginx data will be stored
+              name: nginx-local-pv  # this volumen name could be something 
+      volumes:
+        - name: nginx-local-pv  # this volumen name could be something
+          persistentVolumeClaim:
+            claimName: local-pvc
+
+---
+
+Note :- Whenever u got some trouble in pod u can do describe pods
+. root@controlplane:~/k8s_cluster$ kubectl describe pod/nginx-deployment-7c5b9b4b7f-5tncb -n nginx-dev
+
+Note :- u must also define the namespace in the persistentVolume and persistentVolumeClaim otherwise the storage will be allocated in the default namespace.
+
+---------------------- Delete command for PV and PVC -------------------
+
+- kubectl delete pvc/local-pvc
+- kubectl delete pv/local-pv
+
+------------------------------------------------------------------------
+
+---------------------- Command for more details regarding pod -------------------
+
+- kubectl get pods -n nginx-dev -o wide
+NAME                                READY   STATUS    RESTARTS   AGE     IP           NODE                          NOMINATED NODE   READINESS GATES
+nginx-deployment-7c5b9b4b7f-qx2zc   1/1     Running   0          3m21s   10.244.1.3   k8s-learning-cluster-worker   <none>           <none>
+nginx-deployment-7c5b9b4b7f-z654q   1/1     Running   0          3m21s   10.244.1.2   k8s-learning-cluster-worker   <none>           <none>
+
+------------------------------------------------------------------------
+
+------------------ Deployement -> Service ------------------
+- If u want to access the deployment from external source so there u need the service 
+
+------------------------------------------------------------
