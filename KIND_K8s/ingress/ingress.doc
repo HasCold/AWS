@@ -1,0 +1,11 @@
+--------------------------- INGRESS ----------------------
+
+- Ingress :- Ingress is the traffic re-routing or traffic controller.
+
+/nginx -> nginx-service
+/node -> node-service
+
+- NOTE :- Open source Nginx Ingress controller which has been archived and not currently maintaing anymore, it was used in k8s world. 
+https://github.com/kubernetes/ingress-NGINX 
+
+FOR KIND INGRESS CONTROLLER :- https://kind.sigs.k8s.io/docs/user/ingress/

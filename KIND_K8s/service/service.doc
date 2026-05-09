@@ -18,7 +18,7 @@ spec:
 
 ------- Command if u want to see everything (pod, deployment, service) ------
 
-root@controlplane:~/k8s_cluster$ kubectl get all -n nginx-dev
+root@controlplane:~/k8s_cluster$ kubectl get all -n nginx-dev -o wide
 NAME                                    READY   STATUS    RESTARTS   AGE
 pod/nginx-deployment-55665dbc57-m9lrm   1/1     Running   0          89s
 pod/nginx-deployment-55665dbc57-shpf5   1/1     Running   0          90s
@@ -33,6 +33,7 @@ NAME                                          DESIRED   CURRENT   READY   AGE
 replicaset.apps/nginx-deployment-55665dbc57   2         2         2       90s
 root@controlplane:~/k8s_cluster$ 
 
+- kubectl get svc -n notes-app
 
 --------------------------------------------------
 
