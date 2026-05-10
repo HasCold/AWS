@@ -9,3 +9,39 @@
 https://github.com/kubernetes/ingress-NGINX 
 
 FOR KIND INGRESS CONTROLLER :- https://kind.sigs.k8s.io/docs/user/ingress/
+
+- kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/usage.yaml
+
+-------------------- INGRESS YML FILE ----------------------------
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: nginx-notes-ingress
+    namespace: nginx
+    annotations: # extra information (means /nginx rewrite to port /)
+        nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+    rules:
+    - http:
+        paths:
+        - pathType: Prefix
+          path: /nginx
+          backend:
+            service: 
+                name: nginx-service
+                port: 
+                    number: 80
+        -  pathType: Prefix
+           path: /
+           backend:
+            service:
+                name: notes-app-service
+                port:
+                    number: 8000
+
+---->
+----> kubectl apply -f ingress.yml
+----> kubectl get ing -n nginx
+
+------------------------------------------------------------------

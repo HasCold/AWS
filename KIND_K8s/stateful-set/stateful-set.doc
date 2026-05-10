@@ -1,0 +1,163 @@
+------------------------ STATEFULSET ------------------------
+
+. We can understand statefulset via mysql example.
+
+---> First create a different namespace for mysql
+---> vim namespace.yml
+--->
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: mysql-dev
+
+- kubectl apply -f namespace.yml
+
+----
+
+---> MySQL statefulset manifest file and everything in statefulset is defined in the yml manifest
+---> vim statefulset.yml
+--->
+kind: StatefulSet
+apiVersion: apps/v1
+
+metadata:
+  name: mysql-statefulset
+  namespace: mysql-dev
+
+spec:
+  serviceName: mysql-service
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: mysql-dev
+
+  # Pod template
+  template:
+    metadata:
+      labels:
+        app: mysql-dev
+
+    spec:
+      containers:
+        - name: mysql-dev
+          image: mysql:8.0
+
+          ports:
+            - containerPort: 3306
+
+          # necessary env variables need to pass in mysql
+          # we are taking the value from Secret manifest file of mysql 
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_ROOT_PASSWORD  
+
+          # we are taking the value from ConfigMaps manifest file of mysql
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef: 
+                    name: mysql-config-map
+                    key: MYSQL_DATABASE
+
+          # mysql persistent storage mount
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-data
+
+      spec:
+        accessModes:
+          - ReadWriteOnce
+
+        resources:
+          requests:
+            storage: 1Gi
+
+---
+
+------------------------ Config Maps & Secrets ---------------------------
+---> Generally the env variables and normal variables are defined in statefulset mainfest file via from the ConfigMaps manifest file and it helps basically in this sense whenever u need to modify the database name or something else so u will only modify the values in this ConfigMaps.yml file.
+
+---> vim configMaps.yml
+--->
+kind: ConfigMaps
+apiVersion: v1
+metadata: 
+    name: mysql-config-map
+    namespace: mysql-dev
+data:
+    MYSQL_DATABASE: devops
+
+. Then run kubectl apply -f configMaps.yml
+. Then u can see by running :- kubectl get configmap -n mysql-dev
+
+
+OR 
+
+As u know that we have set the value in plain text in our ConfigMaps.yml file but in case we need to encode the value or encrypt the values so we can do this in Secrets.yml file 
+
+---> vim secrets.yml
+--->
+kind: Secret
+apiVersion: v1
+metadata: 
+    name: mysql-secret
+    namespace: mysql-dev
+data:
+    MYSQL_ROOT_PASSWORD: cm9vdA==   # value will be base64 encoded (root)
+
+. Then run kubectl apply -f secrets.yml
+. Then u can see by running :- kubectl get secrets -n mysql-dev
+
+---------------------------------------------------------------
+
+. Now we need to create the service for statfulset replicas
+So the service will be headless (all will be same and clusterIP will be none)
+
+---> vim service.yml
+--->
+kind: Service
+apiVersion: v1
+metadata:
+    name: mysql-service
+    namespace: mysql-dev
+
+spec:
+    # cluster ip is none means it will not be exposed, it will used as an internal purpose 
+    clusterIP: None  
+    selector:
+        app: mysql-dev
+    
+    ports:
+    - name: mysql
+      protocol: TCP 
+      port: 3306
+      targetPort: 3306
+
+---
+
+Then run :-
+- kubectl apply -f service.yml
+- kubectl apply -f statefulset.yml
+
+- kubectl get svc -n mysql-dev (u can see there the clusterIP and externalIP is none)
+root@controlplane:~/k8s_cluster$ kubectl get svc -n mysql-dev
+NAME            TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+mysql-service   ClusterIP   None         <none>        3306/TCP   9m42s
+
+
+- kubectl get pods -n mysql-dev or watch kubectl get pods -n mysql-dev
+
+. Now we are entering in the mysql pod 
+- kubectl exec -it mysql-statefulset-0 -n mysql-dev -- bash
+  mysql -u root -p
+  root (password)
+
+---
+

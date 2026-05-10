@@ -1,0 +1,3 @@
+- if u want to directly remove all the associated things in the specific namespace 
+
+So command is :- kubectl delete -f namespace.yml
