@@ -1,0 +1,71 @@
+---------------------------- Probes -------------------------
+
+Purpose of Probes
+- Make Health Endpoints
+    - Liveness probe (health checkup)
+    - Readiness probe (when ur probe is going to be ready)
+    - startup probe 
+
+################## Implement Liveness Probe ########################
+
+---> vim deployment.yml
+--->
+kind: Deployment
+apiVersion: apps/v1
+
+metadata:
+  name: nginx-deployment
+  namespace: nginx-dev
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: nginx
+
+  # Pod template
+  template:
+    metadata:
+      labels:
+        app: nginx
+
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+
+        # Liveness Probe
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+        # Readiness Probe
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+
+          # pod resource quota and limit
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+
+            limits: # limit means u can max consume 200m CPU and 256Mi memory usage
+              cpu: 200m
+              memory: 256Mi
+
+          # nginx container path will be mount to one of the volumeMounts
+          volumeMounts:
+            - mountPath: /var/www/html # nginx html file exist in this location where the nginx data will be stored
+              name: nginx-local-pv # this volume name could be something
+
+      volumes:
+        - name: nginx-local-pv # this volume name could be something
+          persistentVolumeClaim:
+            claimName: local-pvc
+
+---

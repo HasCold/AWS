@@ -1,0 +1,17 @@
+------------------------ Taints & Tolerance ---------------------
+
+# Taint
+- Taint means in this context we explictly tell kubernetes cluster that this pod will not go on to the worker_node_1. 
+
+Example :- 
+root@controlplane:~/k8s-cluster$ kubectl get nodes 
+NAME                                 STATUS   ROLES           AGE   VERSION
+k8s-learning-cluster-control-plane   Ready    control-plane   38m   v1.35.0
+k8s-learning-cluster-worker          Ready    <none>          38m   v1.35.0
+
+- kubectl taint node  k8s-learning-cluster-worker prod=true:NoSchedule
+- So then after u try to apply pod deployment (kubectl apply -f pod.yml) on this worker_node_1 so we will see the status is pending
+
+# Tolerance
+- Tolerance is the reverse example of taint :-
+- Tolerance means in this context we explictly tell kubernetes cluster  worker_node_1 to tolerate the pod.
