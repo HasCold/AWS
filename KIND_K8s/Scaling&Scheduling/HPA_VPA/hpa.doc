@@ -1,4 +1,4 @@
------------- Horizontal Pod AutoScaling & Vertical Pod AutoScaling ------------
+----------------- Horizontal Pod AutoScaling --------------------
 
 ----------- Setting up the metrics server
 
@@ -132,10 +132,10 @@ apache-deployment-856cfb8c57-twbff   1/1     Running   0          21m
 --> vim hpa.yml
 -->
 apiVersion: autoscaling/v2
-kind: HorizontalPodAutocaler
+kind: HorizontalPodAutoscaler
 
 metadata:
-  name: apache=hpa
+  name: apache-hpa
   namespace: apache
    
 spec:
@@ -157,5 +157,27 @@ spec:
           type: Utilization
           averageUtilization: 5  # if my cpu utilization reach around 5% so pls make a replica of it 
 ---
+
+---------- For stress tesing we will create load generator pod via this command to test the HPA implementation ----------------
+
+. busybox is a tool where we used to input the command.
+
+Run this -->
+--- kubectl run load-generator \
+  --image=busybox \
+  -n apache \
+  -- /bin/sh -c "while true; do wget -q -O- http://apache-service; done"
+
+
+--- Command to enter into the terminal 
+kubectl exec -it load-generator -n apache  -- sh
+
+. start doing load the shell testing command :-
+while true; do wget -q -O- http://apache-service.apache.svc.cluster.local; done
+
+
+Now u can see the pods are auto scaling based on incoming traffic
+kubectl get pods -n apache
+kubectl get hpa -n apache
 
 -----------------------------------------

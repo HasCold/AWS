@@ -1,0 +1,347 @@
+KIND := Kubernetes Running In Docker 
+
+- Refer the docs for installation setup of KIND on killercoda.com or any cloud platform 
+Link :-
+https://github.com/LondheShubham153/kubestarter/blob/main/kind-cluster/install.sh
+
+------------------- File permission ---------------------------
+
+- chmod 777 install_kind.sh
+
+chmod 777 install_kind.sh is a Linux/Unix file permission command.
+
+1️⃣ chmod
+
+chmod stands for change mode.
+It is used to change permissions of a file or directory.
+
+2️⃣ 777
+
+This number represents permissions for three groups:
+
+Group	Number	Meaning
+Owner	7	Read + Write + Execute
+Group	7	Read + Write + Execute
+Others	7	Read + Write + Execute
+
+Then run the ./install_kind.sh file to complete the setup
+
+------------------------------------------------------------
+
+------------------- K8s Cluster Manifest file Setup ---------------------------
+
+. Create dir /config -->> there create file -->> vim config.yml
+. You can also refer the configuration file -->> https://github.com/LondheShubham153/kubestarter/blob/main/kind-cluster/kind-config.yml
+. Everything in K8s is manifest file. 
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+
+nodes:
+- role: control-plane
+  image: kindest/node:v1.35.0
+- role: worker
+  image: kindest/node:v1.35.0
+- role: worker
+  image: kindest/node:v1.35.0
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
+
+------------------------------------------------------------
+
+------------------- KIND Cluster Creation ---------------------------
+
+- Then Cluster Creation via KIND :-
+kind create cluster --name=k8s-learning-cluster --config=config.yml
+
+------------------------------------------------------------
+
+------------------ Create Folder k8s_in_one_shot (Namespace, Pods, Deployement, Service) ----------------------
+
+- Create k8s_in_one_shot dir there u will be creating the all mainfest files.
+
+---------------------- Then create namespaces.yml file 
+
+--> vim namespace.yml
+--> 
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: nginx-dev
+
+- kubectl apply -f namespace.yml
+
+
+---------------------- Then create pod.yml file 
+
+--> vim pod.yml
+-->
+kind: Pod
+apiVersion: v1
+metadata:
+  name: nginx-pod
+  namespace: nginx-dev
+
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
+
+- kubectl apply -f pod.yml
+- kubectl delete -f pod.yml
+
+If u want to debug the pod u can try this command and check what is runnning in pod :-
+1. kubectl exec -it nginx-pod -n nginx (-n = namespace) -- bash 
+2. kubectl describe pod/nginx-pod -n nginx-dev
+
+------------------------------------------------------------
+
+-------------------- Debugging Logs to check pods -----------------------
+- kubectl describe pod/nginx-pod -n nginx-dev
+------------------------------------------------------------
+
+----------------------- Then create deployment.yml file
+
+Before write any manifest file u can also confirm or check it on kubernetes offical docs like :-  kubernetes deployment
+
+- Important :- What is Label and Selector
+Label :- We will give label to every pod. (appName) 
+Selector :- Selectors in a Deployment are used to match and manage pods whose labels match the specified criteria.
+
+---> vim deployment.yml
+--->
+kind: Deployment
+apiVersion: apps/v1
+metadata: 
+  name: nginx-deployment
+  namespace: nginx-dev
+
+spec:
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: nginx
+
+# pod.yml file basically if u don't write separately u can also do it here as well (template and spec)
+  template:
+    metadata:
+      name: nginx-dep-pod
+      labels:
+        app: nginx
+
+    spec:                  
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports: 
+        - containerPort: 80
+
+---> Then run this command : kubectl apply -f deployment.yml
+
+---> kubectl get deployment -n nginx-dev
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   2/2     2            2           53s
+
+---> Scale up or make the replicas of pod in specified deployment
+---> kubectl scale deployment/nginx-deployment -n nginx-dev --replicas=5
+------------------------------------------------------------
+
+
+---------------- Deployment Rolling Update Command ---------------------------
+
+. ReplicaSet -> bhi replication controller ko control krte ha.
+. StatefulSet -> bhi replicas maintain krte ha. 
+. Deployement -> bhi apke replicas maintain krte ha aur sath ma apke rolling update bhi maintain krte ha.
+
+
+// Let suppose we want to update or shift to the previous nginx image version.
+---> kubectl set image deployment/nginx-deployment -n nginx-dev nginx=1.27.3
+
+// Here u can see the rolling update feature if u got the error still the previous images are running and the updates were sequentially affected.
+---> kubectl get pods -n nginx-dev
+NAME                                READY   STATUS         RESTARTS   AGE
+nginx-deployment-59f86b59ff-5pjgk   1/1     Running        0          93s
+nginx-deployment-59f86b59ff-v7fq9   1/1     Running        0          93s
+nginx-deployment-849c87fc69-pjgd7   0/1     ErrImagePull   0          12s
+
+------------------------------------------------------------
+
+-------------------------- Replica Set (Optional) --------------------------------
+
+. In deployment we can update, scale or can do rolling update things but in replicaset we can't do these things that's why deployment is too flexible.
+
+---> vim replicaset.yml
+---> 
+kind: ReplicaSet
+apiVersion: apps/v1
+metadata: 
+  name: nginx-replicasets
+  namespace: nginx-dev
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+
+  template:
+    metadata:
+        name: nginx-rep-pod
+      labels:
+        app: nginx
+
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+
+. Then run kubectl apply -f replicaset.yml
+
+------------------------------------------------------------
+
+-------------------------- Daemon Set (Optional) ---------------------------------
+
+. Ensure krta ha har node pr ak replica chalta rahe.
+. Command :- to know which pod is assign on which node.
+
+root@controlplane:~/k8s_cluster$ kubectl get pods -n nginx-dev -o wide
+NAME                                READY   STATUS    RESTARTS   AGE   IP            NODE                           NOMINATED NODE   READINESS GATES
+nginx-deployment-74dfc97b57-btl8v   1/1     Running   0          18s   10.244.1.9    k8s-learning-cluster-worker2   <none>           <none>
+nginx-deployment-74dfc97b57-s6msp   1/1     Running   0          18s   10.244.1.10   k8s-learning-cluster-worker2   <none>           <none>
+
+---> vim daemonset.yml
+--->
+kind: DaemonSet
+apiVersion: apps/v1
+metadata: 
+  name: nginx-daemonsets
+  namespace: nginx-dev
+
+spec:
+  selector: 
+    matchLabels:
+      app: nginx
+
+  template:
+    metadata:
+        name: nginx-dmn-pod
+      labels:
+        app: nginx
+
+    spec:                  
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports: 
+        - containerPort: 80
+
+------------------------------------------------------------
+
+-------------------------- Jobs --------------------------------
+
+---> vim job.yml
+--->
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: job-demo
+  namespace: nginx-dev
+ 
+spec:
+  # How many times u need to run this job 
+  completions: 1
+  # How many parallel node or server u need to execute the job
+  parallelism: 1
+
+  # pod template creation
+  template: 
+    metadata: 
+      name: job-pod-demo
+      labels:
+        app: batch-task
+    spec:
+      containers:
+      - name: batch-container
+        image: busybox:latest    # busybox work is just only running the command
+        command: ["sh", "-c", "echo Hello World Program && sleep 10"] # shell command to print statement 
+      restartPolicy: Never
+
+----> 
+
+Run the command :- kubectl apply -f job.yml
+
+Command to see thier executed logs performed in the job :- 
+- kubectl logs pods/job-demo-gps2z -n nginx-dev
+
+------------------------------------------------------------
+
+-------------------------- Cron Jobs --------------------------------
+
+. Website to set the cron-job scheduling time :- https://crontab.guru/
+
+---> vim cron-job.yml
+--->
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  name: minute-backup
+  namespace: nginx-dev
+
+spec:
+  schedule: "* * * * *"
+  # jobTemplate means one single task template
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          name: minute-backup
+          labels:
+            app: minute-backup
+
+    # jobTemplate container
+        spec:
+          containers:
+          - name: backup-container
+            image: busybox
+            command: 
+            - sh
+            - -c
+            - >
+              echo "Backup Started" ;
+              mkdir -p /backups &&
+              mkdir -p /demo-data &&
+              cp -r /demo-data /backups &&
+              echo "Backup Completed!" ;
+
+        # and whenever you assign data to your container so u need volume for it  
+            volumeMounts:
+            - name: data-volume
+              mountPath: /demo-data
+            - name: backup-volume
+              mountPath: /backups
+        restartPolicy: OnFailure    # if pod fails so restart then only.          
+        volumes:
+          - name: data-volume
+            hostPath:
+              path: /demo-data
+              type: DirectoryOrCreate  # if the job doesn't able to find the relevant directory /demo-data so they will create it  
+          - name: backup-volume
+            hostPath:
+              path: /backups
+              type: DirectoryOrCreate
+
+---> Then run the command kubectl apply -f cron-job.yml
+---> root@controlplane:~/k8s-cluster$ kubectl logs pod/minute-backup-29623482-dqbht -n nginx-dev
+Backup Started
+Backup Completed!
+
+------------------------------------------------------------

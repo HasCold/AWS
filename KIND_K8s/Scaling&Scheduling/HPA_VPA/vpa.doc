@@ -1,0 +1,57 @@
+----------------- Vertical Pod AutoScaling ------------------
+
+Doc link for kubernetes auto-scaler :- https://github.com/kubernetes/autoscaler
+
+Clone in your VM or EC2 instance :- 
+. git clone https://github.com/kubernetes/autoscaler.git
+
+After installation :-
+1. cd in to the ./autoscaler/vertical-auto-scaler/ -->> Getting Started installation part
+
+2. There u can see this thing and now follow step 3 :- 
+git clone https://github.com/kubernetes/autoscaler.git
+cd autoscaler/vertical-pod-autoscaler
+git checkout origin/vpa-release-1.0
+REGISTRY=registry.k8s.io/autoscaling TAG=1.0.0 ./hack/vpa-process-yamls.sh apply
+
+3. Then run this ./hack/vpa-up.sh script file
+
+----------------------------- VPA Mainfest ----------------------------
+
+--> vim namespace.yml
+-->
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: apache
+
+
+---> vim vpa.yml
+--->
+kind: VerticalPodAutoScaler
+apiVersion: autoscaling.k8s.io/v1
+metadata:
+    name: apache-vpa
+    namespace: apache
+
+spec:
+    targetRef:
+        name: apache-deployment
+        apiVersion: apps/v1
+        kind: Deployment
+
+        # Auto => Means based on the incoming requests, increase our pod resources vertically
+        # Initial => Means initially u had assigned the resources so allocate them again  
+    updatePolicy:
+        updateMode: "Auto"  
+
+. Then run the kubectl apply -f vpa.yml
+
+
+. kubectl get vpa -n apache
+. watch kubectl get vpa -n apache  // -->> for live actions
+
+. kubectl top pod -n apache
+. kubectl top node
+
+-------------------------------------------------------------------------
