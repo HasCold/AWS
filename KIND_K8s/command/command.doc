@@ -2,3 +2,12 @@
 If u want to see the live changes via running kubectl so u can assign the watch statement with it
 
 - watch kubectl get pods -n mysql-dev
+
+
+For RBAC :-
+- kubectl auth whoami => This will tell you about the current user
+- kubectl auth whoami
+ATTRIBUTE                                           VALUE
+Username                                            kubernetes-admin
+Groups                                              [kubeadm:cluster-admins system:authenticated]
+Extra: authentication.kubernetes.io/credential-id   [X509SHA256=57eac3afe7f9eb0c8e5c2313e8a5195e108d09c02b0fb243a761dac2844eec09]

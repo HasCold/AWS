@@ -1,0 +1,127 @@
+---------------- Role Based Access Control ---------------------
+
+. You can understand this the kuberenetes resources i.e. pods, deployments, services, statefulset etc. Do u have access to it or not so for that we need to define the particular rols for the users exist in the cluster.
+
+----- To learn about the RBAC, u need to learn two things ---------------
+1. Service Account => may be on our node, namespace(deployments) level.
+    Roles => Role Binding
+
+2. User => this will be on our cluster level
+    Cluster Role => Cluster Role Binding
+-------------------------------------------------------------------------
+
+
+-------------------------- Major RBAC Commands --------------------------
+
+1. kubectl auth whoami => This will tell you about the current user
+- kubectl auth whoami
+ATTRIBUTE                                           VALUE
+Username                                            kubernetes-admin
+Groups                                              [kubeadm:cluster-admins system:authenticated]
+Extra: authentication.kubernetes.io/credential-id   [X509SHA256=57eac3afe7f9eb0c8e5c2313e8a5195e108d09c02b0fb243a761dac2844eec09]
+
+2. kubectl auth can-i get pods
+- kubectl auth can-i get pods
+yes
+
+3. kubectl auth can-i get pods -n nginx-dev 
+- kubectl auth can-i get pods -n nginx-dev
+yes
+
+// This is too risky that suppose even any user have delete access role so they delete the deployments also so for this we have RBAC (need to create the role).
+4. kubectl auth can-i delete pods -n nginx-dev  
+- kubectl auth can-i delete pods -n nginx-dev
+yes
+
+--------------------------------------------------------------------------
+
+----------------- To implemeent the Service Account we will work with previous environment that is nginx (namespace, deployments, services) ----------------------
+
+---> vim role.yml
+--->
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1  # ==> group
+metadata:
+    name: nginx-manager
+    namespace: nginx-dev
+
+rules:
+    # "*" = means we are giving the access to all groups
+    # "" = blank group means where the only v1 is written
+    # "apps" = group that are started with apps/v1 something kind of
+    # "batch" = for cronjob etc 
+    - apiGroups: ["", "apps", "rbac.authorization.k8s.io", "batch"]
+
+    # Now define access that u want to give
+      resources: ["deployment", "pod", "service"]
+      verbs: ["get", "apply", "delete", "watch", "create", "patch"]
+
+---
+
+So now it means any user who has this particular role (nginx-manager) can access the deployment, pod and service in order to apply the actions defined in verbs.
+
+- Then run kubectl apply -f role.yml
+- kubectl get role -n nginx-dev
+NAME            CREATED AT
+nginx-manager   2026-05-17T18:31:38Z
+
+- We are creating the service account at the namespace level.
+---> vim service-account.yml
+--->
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+    name: nginx-user
+    namespace: nginx-dev
+
+---
+
+- kubectl apply -f service-account.yml
+serviceaccount/nginx-user created
+- root@controlplane:~/k8s-cluster$ kubectl get serviceaccount -n nginx-dev
+NAME         AGE
+default      27m
+nginx-user   17s
+
+- Now check that nginx-user(service account) can get the pods or not
+- kubectl auth can-i get pod -n nginx-dev --as=nginx-user
+no
+
+- So, we need to bind this particular role with user by role-binding
+---> vim role-binding.yml
+--->
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+
+metadata:
+  name: nginx-manager-rolebinding
+  namespace: nginx-dev
+
+subjects:
+  - kind: User # service account
+    name: nginx-user
+    apiGroup: rbac.authorization.k8s.io
+
+# what role would u like to assign this user 
+roleRef:
+  kind: Role
+  name: nginx-manager
+  apiGroup: rbac.authorization.k8s.io
+
+---
+
+- Then run kubectl apply -f role-binding.yml
+- kubectl get rolebinding -n nginx-dev
+
+- kubectl auth can-i get pods -n nginx-dev --as=nginx-user
+yes
+- kubectl auth can-i get deployment -n nginx-dev --as=nginx-user
+yes
+
+-------------------------------------------------------------------------------
+
+---------- If we need to do the monitoring, observability, metrics and logging so we need to understand the Cluster Role and Cluster Role Binding ---------------
+
+
+
+-------------------------------------------------------------------------------
