@@ -122,6 +122,51 @@ yes
 
 ---------- If we need to do the monitoring, observability, metrics and logging so we need to understand the Cluster Role and Cluster Role Binding ---------------
 
+Go through the Step 4 where dashboard setting up and apply the dashboard manifest file.
+https://github.com/LondheShubham153/kubestarter/blob/main/kind-cluster/README.md
 
+
+---> vim dashboard-admin-user.yml
+--->
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: admin-user
+  namespace: kubernetes-dashboard
+
+---
+
+# Cluster role is already created when we apply the kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0
+# So now we are creating the cluster role binding for it
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: admin-user-role-binding
+  namespace: kubernetes-dashboard
+
+subjects:
+- kind: ServiceAccount
+  name: admin-user
+  namespace: kubernetes-dashboard
+
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+
+---
+
+Then run
+- kubectl apply -f dashboard-admin-user.yml
+serviceaccount/admin-user created
+clusterrolebinding.rbac.authorization.k8s.io/admin-user-role-binding created
+
+NOTE :-
+- So our new admin-user created we will create a token for it so he can further access the dashboard. 
+kubectl -n kubernetes-dashboard create token admin-user
+
+- Now Start with to access the dashboard and also passing the correct Public IP address :-  kubectl proxy --port=8001  --address=0.0.0.0 --accept-hosts='.*'
+- http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
 
 -------------------------------------------------------------------------------
