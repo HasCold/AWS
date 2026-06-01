@@ -1,0 +1,7 @@
+--------------- Custom Resource Definitions ----------------
+
+- In CRDs, we can create our own custom resource and define their structure.
+- so technically all the things we used to do in creating manifest file like: kind, apiVersion, metadata etc.
+
+- Command to see the CRD :- 
+kubectl get crd

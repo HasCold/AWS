@@ -1,0 +1,19 @@
+----------------- Real Kubernetes Traffic Flow -------------------------
+
+. A request from a user:
+
+Internet
+   |
+DNS
+   |
+External Load Balancer
+   |
+Ingress Controller
+   |
+Order Service 1
+   |
+Order Pod
+   |
+Payment Service 2
+   |
+Payment Pod
