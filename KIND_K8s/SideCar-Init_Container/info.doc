@@ -1,0 +1,9 @@
+-------------------- Init & Sidecar Container ------------------------
+
+- These two concepts are generally lie into the pods mainly where containers are actually running inside the pod (pod is the smallest deployable unit in k8s).
+
+- Init Container :- Runs as main container (in which the image will be present)
+- Sidecar Container :- Suppose we have a database like postgre so for initially they could need some kind of seed data or connection or u can understand like this container will be running as a side by side (as a helper) with main container to store the logs etc.  
+
+
+NOTE :- The manifest file for init container will be the kind: Pod because container will be created inside the pod.

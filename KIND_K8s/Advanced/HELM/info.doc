@@ -54,7 +54,124 @@ Now we need to package all the things which is in apache-helm dir :-
 - root@controlplane:~/k8s-cluster/helm$ helm package apache-helm/
 Successfully packaged chart and saved it to: /root/k8s-cluster/helm/apache-helm-0.1.0.tgz
 
-After this we need to create the helm environment like for dev, sandbox and prod
-- helm install dev-apache apache-helm
+After this we need to create the helm environment like for dev, sandbox and prod in the specific namespace 
+- helm install dev-apache apache-helm -n dev-apache --create-namespace
+Means :-
+- helm install <required-chart-name> <from-exist-chart-name> -n <namespace-assign> --create-namespace
+
+Same command for uninstall
+- helm uninstall dev-apache
+
+
+- kubectl get all -n dev-apache
+NAME                                          READY   STATUS    RESTARTS   AGE
+pod/dev-apache-apache-helm-6ff4f7c667-2jnfv   1/1     Running   0          4m44s
+
+NAME                             TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+service/dev-apache-apache-helm   ClusterIP   10.96.67.189   <none>        80/TCP    4m45s
+
+NAME                                     READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/dev-apache-apache-helm   1/1     1            1           4m44s
+
+NAME                                                DESIRED   CURRENT   READY   AGE
+replicaset.apps/dev-apache-apache-helm-6ff4f7c667   1         1         1       4m44s
+
+----------------------------------------------------------------------------
+
+----------------------- Practical Usage with Helm ----------------------
+
+--- * Go and change the replicaCount to 2 in this file :-  
+- root@controlplane:~/k8s-cluster/helm$ vim apache-helm/values.yaml
+
+* And then package again this file via upgrading the patch version :-  
+- root@controlplane:~/k8s-cluster/helm$ vim apache-helm/Chart.yaml 
+- root@controlplane:~/k8s-cluster/helm$ helm package apache-helm
+Successfully packaged chart and saved it to: /root/k8s-cluster/helm/apache-helm-0.1.0.tgz
+- root@controlplane:~/k8s-cluster/helm$ helm upgrade prod-apache ./apache-helm -n prod-apache
+
+
+--- * Rollback from this command
+- helm rollback prod-apache 1 -n prod-apache
+Rollback was a success! Happy Helming!
+
+means:
+prod-apache → Helm release name
+1 → Revision number to roll back to
+-n prod-apache → Kubernetes namespace
+
+
+--------------------------------------------------------------------------
+
+-------------------- Creating Node.js App via HELM ------------------------
+
+- helm create node-js-app
+
+- root@controlplane:~/k8s-cluster/helm/node-js-app$ tree
+.
+|-- Chart.yaml
+|-- charts
+|-- templates
+|   |-- NOTES.txt
+|   |-- _helpers.tpl
+|   |-- deployment.yaml
+|   |-- hpa.yaml
+|   |-- httproute.yaml
+|   |-- ingress.yaml
+|   |-- service.yaml
+|   |-- serviceaccount.yaml
+|   `-- tests
+|       `-- test-connection.yaml
+`-- values.yaml
+
+4 directories, 11 files
+
+* Now change the targetPort by going into the templates service file so they can get the dynamic value from container :- 
+- vim templates/service.yaml
+iapiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "node-js-app.fullname" . }}
+  labels:
+    {{- include "node-js-app.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }} // This one
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "node-js-app.selectorLabels" . | nindent 4 }}
+
+
+* Also change the required things in values.yaml file like adding ur repo image and update the tag to latest and also chanege the port, targetPort as well :- 
+- vim valus.yaml
+# Default values for node-js-app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers
+replicaCount: 1
+
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  repository: hasan1702/notes-app   // This one
+  # This sets the pull policy for images.
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"   // This one
+
+# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ser
+service:
+  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service
+  type: ClusterIP
+  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field
+  port: 8000
+  targetPort: 8000
+
+
+* Now package our node-js app and also create a release from our chart
+- helm package node-js-app/
+- helm install dev-node-js-app node-js-app -n dev-node --create-namespace
 
 ----------------------------------------------------------------------------
