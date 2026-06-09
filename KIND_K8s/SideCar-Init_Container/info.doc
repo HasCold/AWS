@@ -7,3 +7,49 @@
 
 
 NOTE :- The manifest file for init container will be the kind: Pod because container will be created inside the pod.
+
+
+----------------------------------------------------------------
+
+- kubectl apply -f init-container.yml
+- kubectl logs init-test(pod-name) -c init-container(container name) -c main-container(container-name)
+
+----------------------------------------------------------------
+
+--------------- SideCar & Main container manifest file example ---------------
+
+--> vim sidecar-container.yml
+-->
+metadata:
+    name: sidecar-test
+
+spec: 
+    # volume created
+    volume:
+    - name: shared-logs
+      emptyDir: {}
+
+    containers:
+    # main container produce logs to app.log file
+    - name: main-container
+      image: busybox
+      command: ["sh", "-c", "while true, do echo 'Hello World' >> /var/log/app.log; sleep 5; done"]
+      volumeMounts:
+      - name: shared-logs
+        mountPath: /var/log
+
+    # sidecar container display last 10 logs from app.log 
+    - name: sidecar-container
+      image: busybox
+      command: ["sh", "-c", "tail -f /var/log/app.log"]
+      volumeMounts:
+      - name: shared-logs
+        mountPath: /var/log
+--- 
+
+--> kubectl apply -f sidecar-container.yml
+
+--> kubectl logs sidecar-test -c main-container
+--> kubectl logs sidecar-test -c sidecar-container
+
+----------------------------------------------------------------

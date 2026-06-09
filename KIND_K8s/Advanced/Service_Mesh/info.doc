@@ -1,0 +1,70 @@
+------------------------ Service Mesh ----------------------------
+
+- There are multiple microservices orders, cart, product, checkout and invoice etc so all the services are running on different ports so technically these request routes between service-to-service will be handled by the request controller tool called as Service Mesh.
+
+- A service mesh provides a dedicated infrastructure layer to manage service-to-service communication, handling traffic routing, load balancing, security, and observability between microservices.  
+
+- For service mesh there is a popular tool we have Istio.
+Link :- https://istio.io/latest/docs/setup/getting-started/
+
+------------------------------------------------------------------
+
+--------------------- Istio Setup --------------------------
+
+- Follow this istio installing guide for KIND Cluster :- 
+https://istio.io/latest/docs/setup/platform-setup/kind/ 
+
+- After setting up the istio cluster we will download the istio 
+https://istio.io/latest/docs/setup/getting-started/ 
+
+
+- Command to run as per docs :-
+curl -L https://istio.io/downloadIstio | sh -
+cd istio-1.30.1
+cat README.md
+
+- Istio Componenet :- 
+
+**Envoy** - Sidecar proxies per microservice to handle ingress/egress traffic
+   between services in the cluster and from a service to external
+   services. The proxies form a _secure microservice mesh_ providing a rich
+   set of functions like discovery, rich layer-7 routing, circuit breakers,
+   policy enforcement and telemetry recording/reporting
+   functions.
+
+**Istiod** - The Istio control plane. It provides service discovery, configuration and certificate management.
+
+
+- Command to follow :-
+cd bin
+./istioctl  # istioctl ke through hum sare isito ke command chalate ha just like kubectl se hum k8s ke run krte ha
+
+- So now we need to move the istioctl command binary file to our system or user binary file, so that just like our normal command pwd, cd, mkdir etc we can also run the istioctl related commands in our system from anywhere.
+
+root@directory- bin% sudo mv istioctl /usr/local/bin
+
+
+- Now move forward with these commands :-
+root@controlplane:~/k8s-cluster/istio/istio-1.30.1$  istioctl install -f samples/bookinfo/demo-profile-no-gateways.yaml -y
+
+Add a namespace label to instruct Istio to automatically inject Envoy sidecar proxies when you deploy your application later:
+- kubectl label namespace default istio-injection=enabled
+- kubectl get namespace -L istio-injection
+
+
+--- Install the Kubernetes Gateway API CRDs (Custom Resource Definitions) CRDs mean that particular things which are not present inside Kubernetes.
+- kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
+{ kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v1.5.1" | kubectl apply -f -; }
+
+
+--- After that deploy sample application :-
+1. Deploy the Bookinfo sample application:
+- kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml
+
+2. Validate that the app is running inside the cluster by checking for the page title in the response:
+- kubectl exec "$(kubectl get pod -l app=ratings -o jsonpath='{.items[0].metadata.name}')" -c ratings -- curl -sS productpage:9080/productpage | grep -o "<title>.*</title>"
+
+--- Now follow the commands as mentions after the above steps :- 
+https://istio.io/latest/docs/setup/getting-started/#ip
+
+------------------------------------------------------------------
