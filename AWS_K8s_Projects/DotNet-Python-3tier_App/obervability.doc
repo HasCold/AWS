@@ -1,0 +1,24 @@
+--------------------- 360 Degree Cluster Monitoring -------------------------
+
+- In Control Plane/ Master Node, we have componenets like etcd, controller manager and scheduler so API server directly talks with worker node via the kubelet. So how can we make it possible to implement the observability for control plane as well 
+
+- So as u know the control plane or master node have a namespace "kube-system" in which the services etcd, controller manager, scheduler are running so technically we need to monitor these services as well.
+
+- Worker Node Monitoring ==>> Node Exporter
+- Control Plane Monitoring ==>> Kube-State-Metrics
+
+--->> Promethus 
+1. It is a time series database      
+2. It has ability to scrape data   
+3. Query Server (PromQL)
+4. Graphs
+5. Data Store
+    |
+    |
+    |
+    V
+Data gives to the visualization tool like Grafana etc.
+
+--->> Grafana
+1. Visualization
+2. Data Sources

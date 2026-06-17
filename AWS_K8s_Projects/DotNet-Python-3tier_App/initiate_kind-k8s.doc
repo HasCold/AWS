@@ -1,0 +1,62 @@
+---------------- Create a KIND k8s cluster ----------------------
+
+- First install the KIND cluster on EC2 or VM machine
+https://github.com/LondheShubham153/kubestarter/blob/main/kind-cluster/install.sh
+
+- Follow config.yml file for spinning up cluster
+https://github.com/LondheShubham153/kubestarter/blob/main/kind-cluster/kind-config.yml
+
+- Then run this command :- 
+kind create cluster --name=3-tier-app-cluster --config=config.yml
+
+- Install the HELM :- 
+HELM Definition :- A package manager for Kubernetes
+HELM Chart Definition :- A pre-configured package of Kubernetes resources. (It contains all YAML files needed to deploy an app)
+
+-->
+. mkdir monitoring
+. cd monitoring
+
+--> Install via the curl command in monitoring dir
+- curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-4
+- ls -l  // to check the helm shell script has executable permission or if not run the below command
+- chmod 700 get_helm.sh
+- ./get_helm.sh
+
+---
+
+--> 
+. We will work in a separate namespace for monitoring
+
+- kubectl create namespace monitoring
+
+This the repo to setup the prometheus which u find on prometheus community HELM chart
+. https://github.com/prometheus-community/helm-charts
+
+Run this command :- 
+- helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+- By this command all your prometheus community helm charts or manifest files will be inside the system.
+
+- You can see by this command :- helm repo list
+- And after that need to update as well :- helm repo update
+
+- Now we need to install the prometheus stack through the helm repo and also need to expose or set the Prometheus and Grafana service via the node-port
+- And one thing important by-default your prometheus stack comes with cluster IP so we need to make it configure for nodePort
+
+. Command :- helm install prometheus-stack prometheus-community/kube-prometheus-stack --namespace monitoring --set prometheus.service.nodePort=30000 --set grafana.service.nodePort=31000 --set grafana.service.type=NodePort --set prometheus.service.type=NodePort
+
+
+- Then run this:- kubectl get svc -n monitoring
+
+- And u can access the prometheus and grafana via this way 
+. kubectl port-forward svc/prometheus-stack-kube-prom-prometheus 9090:9090 -n monitoring --address=0.0.0.0
+. Now it is running on port 9090
+
+. kubectl port-forward svc/prometheus-stack-grafana 3000:80 -n monitoring --address=0.0.0.0
+. Now it is running on port 9090
+
+
+- Also we can retrieve the secrets regarding Prometheus and Grafana from our k8s
+. kubectl get secret prometheus-stack-grafana -n monitoring -o jsonpath="{.data.admin-password}" | base64 --decode
+
+---
